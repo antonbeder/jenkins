@@ -1,0 +1,163 @@
+1.pwd-show currently
+2.dhclient - make requests to Network for Ip address.
+3.ip addr sh - show ip address
+4.mkdir "name of dir"  - create a new directory
+5.rmdir "name of dir" - delete the directory if it empty
+6.rm -rf "name of dir" - delete directory including all filles
+7.vi - file redactor.    :set paste - it commande make exactlly copy file
+8.sudo -i to be root allways
+9.sudo hostnamectl set-hostname "Name"    to change hostname of machine 
+10.wget "link"  i use this command for save some files on ubuntu.i selecte the file make copy link ,come to ubuntu machine and put wget command with copyed link.automaticly the selected file gonna be download to ubuntu
+11. mv "old name" "new name" it's the command to change the name of file/folder ect...
+                                                        DOCKERS
+
+1.docker run -v /var/test:/var/test -p 8080:8080 name or id docker image
+2.docker rm -f "namy or id container" - to stop running the container
+3.docker images - to show all available images
+4.docker ibspect id/name  - to show all info about conteiner
+5.docker-compose up    - to run compose file (-d make the process hidden)
+6.docker-compose ps  - to show running images
+
+
+                                                      Git
+
+1.git clone "link to relevant repo from github" - to copy relevant repo to local mashine
+2.git status - show status of files.difference between original repo and added files
+3.git add . - adds files that we want to send to github.these files must be in the same location as original repo.if not we must indicate the direction
+3-a. git rm --cached "name of wanted file" or . for all attached files. this command unttached from git selected files.
+If we changed tracked(after add command) files we have to put "git add ." command again.
+4.git commit -m "freetext" 
+5.git push origin main -  to push to our github
+6. git branch - show which branch we belong
+7.git branch "name" create a new branch
+8.git branch -D "name" delete the branch
+9. git checkout "name" - switch to selected branch
+10.git checkout -b "name"  -  create and switch to new branch
+11.git merge "name" - merge currently branch with selected
+12.git config --global user.email "you@example.com"
+   git config --global user.name "Your Name"        
+two commands for credentials to git hub
+
+                                                        SSH
+
+For connection between machines(server-client) we need to create/generate Key on the server machine
+1. enter/enter/enter 
+2.This command create 2 keys in location /home/ubuntu/.ssh : 1. id_rsa it's private key and him have to stay here allways
+                                                             2. id_rsa.pub it's public key  his content we have to copy to remote machine(client) to location:/home/ubuntu/.ssh/authorized_keys
+*impotante! if another key already exists on the client then the contens of the desired key must be written under the existing key.
+
+
+
+                                                 Ansible
+
+1.ansible-playbook "name of playbook.yaml"   -  to invoke the playbook of ansible
+2./etc/ansible/hosts    - here we have to define all locations(ip or dns) that we would like execute ansibles playbook
+3.for connections we need to use ssh protocol and to create ssh security key on the main server. the key divided into two key:private and public.
+private stay on the main server allways .public we copy to all locations that we want to connect .~/.ssh/authorized_key  is location to there we have to copy public key
+4.ansible -m ping all   this command check if our connection is done and good.
+answer :3.128.182.172 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+
+                                                              Ansible-role
+
+1.ansible-galaxy init "name" to creat role of ansible
+2./etc/ansible/roles is default locations of ansible-role if it doesnt exit we have to create 
+and exactly there we need to invoke command ansible-galaxy init "name" and system automatecly create all directores
+default-variablse
+file-variablse constant
+task-all modules
+test-check if the role done fix
+example:
+roles:
+- { role: "name of role"}
+
+
+
+                                                   Terraform
+
+
+1.to install terraform  on windows machine pls following according insruction:
+ download relivanty file from terrafon site
+ unziping him
+ create folder on C/ 
+ put the file there
+ right click on myPc->propirtes->Advanced system setting->enviroment Variables ->double click on path->create new->put path of installation file-> save
+2.to install terraform on ubuntu machine pls following according insruction:
+selecte relivanty file from terrafon site
+right click on the file, make copy link address
+come to terminal of ubuntu and put command wget "link address" ,file zip is download
+put command unzip on the file
+sudo cp "unziping file" /usr/local/bin/
+3. after create terraform file.tf on VS-code we have to put command  "terraform init" in terminal
+exactly where the file.tf located
+put command "terraform plan" just to check what terraform gonna create or change
+put command "terraform apply"  we confirm about changes
+value:yes
+
+if we want to remove all created itemes
+put command:"terraform destroy
+yes
+put command "terraform state list" show all resource that we created
+put command "terraform destroy -target "name of instance" " delete specifical iteims
+
+terraform.tfvars this is saved name of the file on system there we put all value of the variables
+if we put values into file that his name isn"t terraform.tfvars system doesn"t can call the values we need to put name of the file into comand line
+example: name of the file of values - values
+commnad line - terraform plan/apply -var-file= values
+
+type of avalibales values on terraform:
+1-string
+2-boolean
+3-list      example via command line:terraform plan/apply -var 'vpc_cidr_block=["10.0.0.0/16,"10.20.0.0/16]' here we send 2 values to variable vpc_cidr_block
+4-map (key->value)    example via command line:plan/apply -var 'name of variable={name of key="name of value"}'
+----
+to sent request to AWS about all vpc existing and print them: data "aws_vpcs" "free name value"{
+}
+output "vpcs" {
+value = data.awc_vpcs.name of value
+}
+----
+ way to add PairKey to attach the key to created instances:
+
+   resource "aws_instance" "my_ubuntu" {
+   #count of instances that will create 
+    count = 2
+    ami = "ami-0932440befd74cdba"
+    instance_type = "t2.micro"
+    user_data = file ("user_data")
+    vpc_security_group_ids = [aws_security_group.MyFirstSG.id]
+    key_name="MyPairKey2"     # here we put name of existing  pair key
+}
+#######Create new EC2 key pair########
+    resource "tls_private_key" "this" {
+    algorithm = "RSA"
+    }
+
+    module "key_pair" {
+    source = "terraform-aws-modules/key-pair/aws"
+
+    key_name   = "deployer-one"
+    public_key = tls_private_key.this.public_key_openssh
+}
+
+
+
+
+
+                                                      Aws
+IAM - to manage users settings
+VOLUME -  HDD/SSH DISC
+Snapshot - image of disc 
+AMI -Amazon Machine Image - it's total image of instance
+we can create the instance on the didicated hardware (this option for some installations when we need unic id of OS)
+or shared hardwarw it's best practic to use installation when not matter any id - name of this option is Tenancy(AWS)
+VPC->Internet Gatewa->
+
+                                        Jenkins
+1. have install java 8 or 11
+2.have install jenkins
+3.when we create the new job: CheckBox - Discard old builds - here i define  how many time or how many built i will save
+                              CheckBox - Execute concurrent builds necessary - here i agree to run  few builds in the same time
+
